@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Port Scan Results</title>
+<style>
+  :root {
+    --bg-dark: #000;
+    --bg-light: #fefefe;
+    --text-dark: #eee;
+    --text-light: #111;
+    --green: #4ade80;
+    --red: #f87171;
+    --blue: #0ff;
+  }
+
+  body {
+    background-color: var(--bg-dark);
+    color: var(--text-dark);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0; padding: 20px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  body.light {
+    background-color: var(--bg-light);
+    color: var(--text-light);
+  }
+
+  h1 {
+    font-weight: 900;
+    text-align: center;
+    margin-bottom: 5px;
+  }
+
+  #summary {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+  }
+
+  #summary span {
+    font-weight: bold;
+    margin: 0 15px;
+  }
+
+  #controls {
+    max-width: 900px;
+    margin: 0 auto 20px auto;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    align-items: center;
+  }
+
+  #searchBox {
+    flex: 1 1 300px;
+    padding: 8px 10px;
+    font-size: 1rem;
+    border-radius: 6px;
+    border: none;
+    outline: none;
+  }
+
+  button {
+    cursor: pointer;
+    border: none;
+    background-color: var(--blue);
+    color: var(--bg-dark);
+    padding: 10px 15px;
+    font-size: 1rem;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+    font-weight: 700;
+  }
+
+  button:hover {
+    background-color: #00ffffcc;
+  }
+
+  .collapsible {
+    background-color: #111;
+    color: var(--text-dark);
+    cursor: pointer;
+    padding: 14px 18px;
+    width: 90%;
+    max-width: 900px;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 1.2rem;
+    font-weight: 700;
+    border-radius: 10px;
+    margin: 8px auto;
+    transition: background-color 0.3s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .collapsible.light {
+    background-color: #ddd;
+    color: var(--text-light);
+  }
+  .collapsible:hover {
+    background-color: var(--blue);
+    color: var(--bg-dark);
+  }
+  .active, .collapsible:hover {
+    background-color: var(--blue);
+    color: var(--bg-dark);
+  }
+  .collapsible::after {
+    content: '\25bc';
+    font-size: 1rem;
+    transition: transform 0.3s ease;
+  }
+  .active::after {
+    transform: rotate(180deg);
+  }
+
+  .content {
+    max-width: 900px;
+    margin: 0 auto 15px auto;
+    padding: 0 18px;
+    background-color: #111;
+    overflow: hidden;
+    border-radius: 8px;
+    max-height: 0;
+    transition: max-height 0.35s ease-out, padding 0.35s ease-out;
+    color: var(--text-dark);
+  }
+  .content.light {
+    background-color: #eee;
+    color: var(--text-light);
+  }
+  .content.show {
+    padding: 12px 18px;
+    max-height: 1000px;
+  }
+
+  .port-entry {
+    padding: 10px;
+    border-bottom: 1px solid #333;
+    font-size: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .port-entry:hover {
+    background-color: var(--blue);
+    color: var(--bg-dark);
+    cursor: default;
+  }
+  .port-entry .open {
+    color: var(--green);
+    font-weight: 700;
+    min-width: 60px;
+  }
+  .port-entry .closed {
+    color: var(--red);
+    font-weight: 700;
+    min-width: 60px;
+  }
+  .port-entry .port {
+    flex-grow: 1;
+    font-family: monospace;
+  }
+  .port-entry .banner {
+    font-style: italic;
+    opacity: 0.85;
+    flex-basis: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+
+  #chart-container {
+    width: 90%;
+    max-width: 900px;
+    margin: 30px auto;
+    background-color: #111;
+    padding: 15px;
+    border-radius: 15px;
+    box-shadow: 0 0 15px var(--blue);
+  }
+  #chart-container.light {
+    background-color: #eee;
+    box-shadow: 0 0 15px #00aaff;
+  }
+
+  @media (max-width: 600px) {
+    .collapsible, .content {
+      width: 95%;
+    }
+    #controls {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    button, #searchBox {
+      width: 100%;
+    }
+  }
+</style>
+</head>
+<body>
+
+<h1>Port Scan Results for 192.168.1.1</h1>
+
+<div id="summary">
+  <span>Total Ports Scanned: 20</span> | 
+  <span style="color: var(--green)">Open: 5</span> | 
+  <span style="color: var(--red)">Closed: 15</span> | 
+  <span>Scan Time: 2025-05-18 16:00:00</span>
+</div>
+
+<div id="controls">
+  <input type="text" id="searchBox" placeholder="Search ports or banners..." />
+  <button id="toggleThemeBtn" title="Toggle dark/light mode">Toggle Dark/Light</button>
+</div>
+
+<button type="button" class="collapsible">Open Ports (5)</button>
+<div class="content" id="openContent">
+  <div class="port-entry" data-port="22" data-banner="ssh server" data-status="open">
+    <span class="open">OPEN</span>, <span class="port">Port 22</span>, Banner: <span class="banner">SSH Server</span>
+  </div>
+  <div class="port-entry" data-port="80" data-banner="apache httpd" data-status="open">
+    <span class="open">OPEN</span>, <span class="port">Port 80</span>, Banner: <span class="banner">Apache HTTPD</span>
+  </div>
+  <div class="port-entry" data-port="443" data-banner="nginx https" data-status="open">
+    <span class="open">OPEN</span>, <span class="port">Port 443</span>, Banner: <span class="banner">NGINX HTTPS</span>
+  </div>
+  <div class="port-entry" data-port="3306" data-banner="mysql server" data-status="open">
+    <span class="open">OPEN</span>, <span class="port">Port 3306</span>, Banner: <span class="banner">MySQL Server</span>
+  </div>
+  <div class="port-entry" data-port="8080" data-banner="tomcat server" data-status="open">
+    <span class="open">OPEN</span>, <span class="port">Port 8080</span>, Banner: <span class="banner">Tomcat Server</span>
+  </div>
+</div>
+
+<button type="button" class="collapsible">Closed Ports (15)</button>
+<div class="content" id="closedContent">
+  <div class="port-entry" data-port="21" data-banner="" data-status="closed">
+    <span class="closed">CLOSED</span>, <span class="port">Port 21</span>, Banner: <span class="banner">No banner</span>
+  </div>
+  <div class="port-entry" data-port="23" data-banner="" data-status="closed">
+    <span class="closed">CLOSED</span>, <span class="port">Port 23</span>, Banner: <span class="banner">No banner</span>
+  </div>
+  <div class="port-entry" data-port="25" data-banner="" data-status="closed">
+    <span class="closed">CLOSED</span>, <span class="port">Port 25</span>, Banner: <span class="banner">No banner</span>
+  </div>
+  <div class="port-entry" data-port="53" data-banner="" data-status="closed">
+    <span class="closed">CLOSED</span>, <span class="port">Port 53</span>, Banner: <span class="banner">No banner</span>
+  </div>
+  <div class="port-entry" data-port="110" data-banner="" data-status="closed">
+    <span class="closed">CLOSED</span>, <span class="port">Port 110</span>, Banner: <span class="banner">No banner</span>
+  </div>
+  <div class="port-entry" data-port="143" data-banner="" data-status="closed">
+    <span class="closed">CLOSED</span>, <span class="port">Port 143</span>, Banner: <span class="banner">No banner</span>
+  </div>
+  <div class="port-entry" data-port="445" data-banner="" data-status="closed">
+    <span class="closed">CLOSED</span>, <span class="port">Port 445</span>, Banner: <span class="banner">No banner</span>
+  </div>
+  <div class="port-entry" data-port="993" data-banner="" data-status="closed">
+    <span class="closed">CLOSED</span>, <span class="port">Port 993</span>, Banner: <span class="banner">No banner</span>
+  </div>
+  <div class="port-entry" data-port="995" data-banner="" data-status="closed">
+    <span class="closed">CLOSED</span>, <span class="port">Port 995</span>, Banner: <span class="banner">No banner</span>
+  </div>
+  <div class="port-entry" data-port="1723" data-banner="" data-status="closed">
+    <span class="closed">CLOSED</span>, <span class="port">Port 1723</span>, Banner: <span class="banner">No banner</span>
+  </div>
+  <div class="port-entry" data-port="2049" data-banner="" data-status="closed">
+    <span class="closed">CLOSED</span>, <span class="port">Port 2049</span>, Banner: <span class="banner">No banner</span>
+  </div>
+  <div class="port-entry" data-port="3307" data-banner="" data-status="closed">
+    <span class="closed">CLOSED</span>, <span class="port">Port 3307</span>, Banner: <span class="banner">No banner</span>
+  </div>
+  <div class="port-entry" data-port="5000" data-banner="" data-status="closed">
+    <span class="closed">CLOSED</span>, <span class="port">Port 5000</span>, Banner: <span class="banner">No banner</span>
+  </div>
+  <div class="port-entry" data-port="5432" data-banner="" data-status="closed">
+    <span class="closed">CLOSED</span>, <span class="port">Port 5432</span>, Banner: <span class="banner">No banner</span>
+  </div>
+  <div class="port-entry" data-port="5900" data-banner="" data-status="closed">
+    <span class="closed">CLOSED</span>, <span class="port">Port 5900</span>, Banner: <span class="banner">No banner</span>
+  </div>
+</div>
+
+<div id="chart-container">
+  <canvas id="portChart"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+(() => {
+  // Collapsible toggles
+  document.querySelectorAll('.collapsible').forEach(button => {
+    button.addEventListener('click', () => {
+      button.classList.toggle('active');
+      let content = button.nextElementSibling;
+      if(content.style.maxHeight){
+        content.style.maxHeight = null;
+        content.classList.remove('show');
+      } else {
+        content.style.maxHeight = content.scrollHeight + "px";
+        content.classList.add('show');
+      }
+    });
+  });
+
+  // Dark/light mode toggle
+  const toggleBtn = document.getElementById('toggleThemeBtn');
+  const body = document.body;
+  toggleBtn.addEventListener('click', () => {
+    body.classList.toggle('light');
+    document.querySelectorAll('.collapsible').forEach(c => c.classList.toggle('light'));
+    document.querySelectorAll('.content').forEach(c => c.classList.toggle('light'));
+    document.getElementById('chart-container').classList.toggle('light');
+  });
+
+  // Search filter
+  const searchBox = document.getElementById('searchBox');
+  searchBox.addEventListener('input', () => {
+    const term = searchBox.value.toLowerCase();
+    document.querySelectorAll('.port-entry').forEach(entry => {
+      const banner = entry.dataset.banner.toLowerCase();
+      const port = entry.dataset.port.toLowerCase();
+      if(port.includes(term) || banner.includes(term)){
+        entry.style.display = 'flex';
+      } else {
+        entry.style.display = 'none';
+      }
+    });
+  });
+
+  // Chart.js setup
+  const ctx = document.getElementById('portChart').getContext('2d');
+
+  // Collect open and closed port numbers from entries
+  const openPorts = Array.from(document.querySelectorAll('.port-entry[data-status="open"]'))
+    .map(e => parseInt(e.dataset.port));
+  const closedPorts = Array.from(document.querySelectorAll('.port-entry[data-status="closed"]'))
+    .map(e => parseInt(e.dataset.port));
+
+  // Bucket ports into ranges of 100 for charting
+  // e.g. 0-99, 100-199, ..., 900-999
+  function bucketPorts(ports) {
+    const buckets = new Array(10).fill(0);
+    ports.forEach(p => {
+      let index = Math.min(Math.floor(p / 100), 9);
+      buckets[index]++;
+    });
+    return buckets;
+  }
+
+  const openBuckets = bucketPorts(openPorts);
+  const closedBuckets = bucketPorts(closedPorts);
+
+  const labels = [
+    '0-99', '100-199', '200-299', '300-399', '400-499',
+    '500-599', '600-699', '700-799', '800-899', '900-999'
+  ];
+
+  const data = {
+    labels: labels,
+    datasets: [
+      {
+        label: 'Open Ports',
+        data: openBuckets,
+        backgroundColor: 'rgba(74, 222, 128, 0.7)', // green
+        borderColor: 'rgba(74, 222, 128, 1)',
+        borderWidth: 1
+      },
+      {
+        label: 'Closed Ports',
+        data: closedBuckets,
+        backgroundColor: 'rgba(248, 113, 113, 0.7)', // red
+        borderColor: 'rgba(248, 113, 113, 1)',
+        borderWidth: 1
+      }
+    ]
+  };
+
+  const config = {
+    type: 'bar',
+    data: data,
+    options: {
+      responsive: true,
+      animation: {
+        duration: 1000,
+        easing: 'easeOutQuart'
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          stepSize: 1,
+          ticks: {
+            precision: 0
+          },
+          title: {
+            display: true,
+            text: 'Count'
+          }
+        },
+        x: {
+          title: {
+            display: true,
+            text: 'Port Ranges'
+          }
+        }
+      },
+      plugins: {
+        legend: {
+          position: 'top',
+          labels: {
+            font: {
+              weight: '700'
+            }
+          }
+        },
+        tooltip: {
+          mode: 'index',
+          intersect: false
+        }
+      }
+    },
+  };
+
+  const portChart = new Chart(ctx, config);
+})();
+</script>
+
+</body>
+</html>

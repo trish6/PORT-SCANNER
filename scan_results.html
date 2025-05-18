@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Port Scan Results</title>
+<style>
+    body {
+        background-color: #000;
+        color: #eee;
+        font-family: Arial, sans-serif;
+        padding: 20px;
+    }
+    h1 {
+        color: #fff;
+        font-weight: bold;
+        text-align: center;
+    }
+    .open {
+        color: #4ade80;  /* bright green */
+        background-color: #022c22;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 8px;
+    }
+    .closed {
+        color: #f87171;  /* soft red */
+        background-color: #2c0000;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 8px;
+    }
+    #chart-container {
+        width: 60%;
+        margin: 30px auto;
+        background-color: #111;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px #0ff;
+    }
+</style>
+</head>
+<body>
+<h1>Port Scan Results</h1>
+
+<div id="chart-container">
+    <canvas id="portChart"></canvas>
+</div>
+
+<div>
+<div class="closed">CLOSED, Port 448, Error: timed out</div>
+<div class="closed">CLOSED, Port 446, Error: timed out</div>
+<div class="closed">CLOSED, Port 449, Error: timed out</div>
+<div class="closed">CLOSED, Port 447, Error: timed out</div>
+<div class="closed">CLOSED, Port 455, Error: timed out</div>
+<div class="closed">CLOSED, Port 456, Error: timed out</div>
+<div class="closed">CLOSED, Port 451, Error: timed out</div>
+<div class="closed">CLOSED, Port 458, Error: timed out</div>
+<div class="closed">CLOSED, Port 452, Error: timed out</div>
+<div class="closed">CLOSED, Port 454, Error: timed out</div>
+<div class="closed">CLOSED, Port 450, Error: timed out</div>
+<div class="closed">CLOSED, Port 453, Error: timed out</div>
+<div class="closed">CLOSED, Port 462, Error: timed out</div>
+<div class="closed">CLOSED, Port 464, Error: timed out</div>
+<div class="closed">CLOSED, Port 457, Error: timed out</div>
+<div class="closed">CLOSED, Port 466, Error: timed out</div>
+<div class="closed">CLOSED, Port 463, Error: timed out</div>
+<div class="closed">CLOSED, Port 460, Error: timed out</div>
+<div class="closed">CLOSED, Port 467, Error: timed out</div>
+<div class="closed">CLOSED, Port 459, Error: timed out</div>
+<div class="closed">CLOSED, Port 461, Error: timed out</div>
+<div class="closed">CLOSED, Port 465, Error: timed out</div>
+<div class="closed">CLOSED, Port 485, Error: timed out</div>
+<div class="closed">CLOSED, Port 487, Error: timed out</div>
+<div class="closed">CLOSED, Port 488, Error: timed out</div>
+<div class="closed">CLOSED, Port 469, Error: timed out</div>
+<div class="closed">CLOSED, Port 476, Error: timed out</div>
+<div class="closed">CLOSED, Port 473, Error: timed out</div>
+<div class="closed">CLOSED, Port 491, Error: timed out</div>
+<div class="closed">CLOSED, Port 468, Error: timed out</div>
+<div class="closed">CLOSED, Port 480, Error: timed out</div>
+<div class="closed">CLOSED, Port 478, Error: timed out</div>
+<div class="closed">CLOSED, Port 484, Error: timed out</div>
+<div class="closed">CLOSED, Port 471, Error: timed out</div>
+<div class="closed">CLOSED, Port 483, Error: timed out</div>
+<div class="closed">CLOSED, Port 493, Error: timed out</div>
+<div class="closed">CLOSED, Port 492, Error: timed out</div>
+<div class="closed">CLOSED, Port 482, Error: timed out</div>
+<div class="open">OPEN, Port 445, Banner: Banner grab failed</div>
+<div class="closed">CLOSED, Port 477, Error: timed out</div>
+<div class="closed">CLOSED, Port 474, Error: timed out</div>
+<div class="closed">CLOSED, Port 495, Error: timed out</div>
+<div class="closed">CLOSED, Port 472, Error: timed out</div>
+<div class="closed">CLOSED, Port 497, Error: timed out</div>
+<div class="closed">CLOSED, Port 481, Error: timed out</div>
+<div class="closed">CLOSED, Port 498, Error: timed out</div>
+<div class="closed">CLOSED, Port 499, Error: timed out</div>
+<div class="closed">CLOSED, Port 496, Error: timed out</div>
+<div class="closed">CLOSED, Port 486, Error: timed out</div>
+<div class="closed">CLOSED, Port 490, Error: timed out</div>
+<div class="closed">CLOSED, Port 479, Error: timed out</div>
+<div class="closed">CLOSED, Port 489, Error: timed out</div>
+<div class="closed">CLOSED, Port 500, Error: timed out</div>
+<div class="closed">CLOSED, Port 470, Error: timed out</div>
+<div class="closed">CLOSED, Port 494, Error: timed out</div>
+<div class="closed">CLOSED, Port 475, Error: timed out</div>
+
+</div>
+
+<!-- Chart.js library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const ctx = document.getElementById('portChart').getContext('2d');
+const portChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: ['Open Ports', 'Closed Ports'],
+        datasets: [{
+            label: 'Number of Ports',
+            data: [1, 55],
+            backgroundColor: [
+                'rgba(74, 222, 128, 0.7)',  // green
+                'rgba(248, 113, 113, 0.7)'   // red
+            ],
+            borderColor: [
+                'rgba(74, 222, 128, 1)',
+                'rgba(248, 113, 113, 1)'
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true,
+                precision: 0,
+                ticks: {
+                    color: '#eee'
+                },
+                grid: {
+                    color: '#333'
+                }
+            },
+            x: {
+                ticks: {
+                    color: '#eee'
+                },
+                grid: {
+                    color: '#333'
+                }
+            }
+        },
+        plugins: {
+            legend: {
+                labels: {
+                    color: '#eee'
+                }
+            }
+        }
+    }
+});
+</script>
+
+</body>
+</html>
